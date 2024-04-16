@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: ddo_fit_3_7
+
+bot:
+  name: crypto_3_7_bot
+  token: 7138105273:AAETC39S8RxHL_p6WOCzr_XCVB9_Qirgttc
+
+api:
+  url: https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=1&limit=10&convert=USD
+  key: be5f04f5-a590-4e22-8ea5-9384fc72e4aa
