@@ -17,8 +17,8 @@ import java.util.stream.IntStream;
 public class CurrencyService {
     private final RestClient restClient;
 
-    public List<CurrencyModel> getCurrencyRate() {
-        JSONObject jsonResponse = new JSONObject(restClient.get().retrieve().body(String.class));
+    public List<CurrencyModel> getTop10CurrencyRate() {
+        JSONObject jsonResponse = new JSONObject(restClient.get().uri("/listings/latest?start=1&limit=10&convert=USD").retrieve().body(String.class));
         JSONArray jsonArray = jsonResponse.getJSONArray("data");
         var resultList = new ArrayList<CurrencyModel>();
 
@@ -27,10 +27,19 @@ public class CurrencyService {
                 .forEach(jsonObject -> {
                     resultList.add(new CurrencyModel(jsonObject.getString("name"),
                         jsonObject.getString("symbol"), new DecimalFormat("#.##").format(jsonObject.getJSONObject("quote")
-                            .getJSONObject("USD").getDouble("price"))));
+                            .getJSONObject("USD").getDouble("price")),
+                            new DecimalFormat("#.##").format(jsonObject.getJSONObject("quote").getJSONObject("USD").getDouble("percent_change_24h"))));
                 });
 
         return resultList;
+    }
+
+    public CurrencyModel getPrice(String symbol) {
+        JSONObject jsonResponse = new JSONObject(restClient.get().uri("/quotes/latest?symbol=" + symbol).retrieve().body(String.class));
+        JSONObject jsonObject = jsonResponse.getJSONObject("data").getJSONObject(symbol.toUpperCase());
+        return new CurrencyModel(jsonObject.getString("name"), jsonObject.getString("symbol"), new DecimalFormat("#.##").format(jsonObject.getJSONObject("quote")
+                .getJSONObject("USD").getDouble("price")),
+                new DecimalFormat("#.##").format(jsonObject.getJSONObject("quote").getJSONObject("USD").getDouble("percent_change_24h")));
     }
 
 }

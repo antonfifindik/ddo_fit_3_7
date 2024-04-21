@@ -9,4 +9,5 @@ public class CurrencyModel {
     String name;
     String symbol;
     String price;
+    String percentChange;
 }

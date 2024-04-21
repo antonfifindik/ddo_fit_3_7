@@ -39,12 +39,21 @@ public class TelegramBot extends TelegramLongPollingBot {
                     startCommandReceived(chatId, update.getMessage().getChat().getFirstName());
                     break;
                 case "/price":
-                    var message = new StringBuilder();
-                    for (CurrencyModel currency : currencyService.getCurrencyRate()) {
-                        message.append(currency.getSymbol()).append(" (").append(currency.getName()).append(")").append("\n")
+                    var top10Message = new StringBuilder();
+                    for (CurrencyModel currency : currencyService.getTop10CurrencyRate()) {
+                        top10Message.append(currency.getSymbol()).append(" (").append(currency.getName()).append(")").append("\n")
                                 .append("\n").append(currency.getPrice()).append(" usd")
+                                .append("\n24h change: ").append(currency.getPercentChange()).append("%")
                                 .append("\n-----------------------------\n\n");
                     }
+                    sendMessage(chatId, top10Message.toString());
+                    break;
+                default:
+                    var message = new StringBuilder();
+                    CurrencyModel currency = currencyService.getPrice(messageText);
+                    message.append(currency.getSymbol()).append(" (").append(currency.getName()).append(")").append("\n")
+                            .append("\n").append(currency.getPrice()).append(" usd")
+                            .append("\n24h change: ").append(currency.getPercentChange()).append("%");
                     sendMessage(chatId, message.toString());
                     break;
             }
@@ -54,7 +63,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void startCommandReceived(Long chatId, String name) {
         String answer = "Hi, " + name + ", nice to meet you!" + "\n\n" +
                 "Available commands:\n" +
-                "/price - get current prices for the top 10 cryptocurrencies";
+                "/price - get current prices for the top 10 cryptocurrencies\n\n" +
+                "Or write the name of the required cryptocurrency. For example: near";
         sendMessage(chatId, answer);
     }
 
